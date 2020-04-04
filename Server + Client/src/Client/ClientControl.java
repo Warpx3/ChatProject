@@ -12,6 +12,7 @@ import java.net.Socket;
 import java.net.UnknownHostException;
 
 import javax.swing.DefaultListModel;
+import javax.swing.JOptionPane;
 
 public class ClientControl implements Runnable
 {
@@ -29,13 +30,15 @@ public class ClientControl implements Runnable
 	private DefaultListModel<String> nachrichten = new DefaultListModel<String>();
 	
 	private ClientGui clientGui;
+	private ClientAnmeldung anmeldung;
+	private ClientRegistrierung registrierung;
 	
 	private Thread t;
 	
 	
 	public ClientControl()
 	{
-		this.clientGui = new ClientGui(this);
+		this.anmeldung = new ClientAnmeldung(this);
 		clientGui.getList().setModel(nachrichten);
 	}
 	
@@ -121,5 +124,40 @@ public class ClientControl implements Runnable
 			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
+	}
+	
+	public void oeffneRegistrierung()
+	{
+		this.registrierung = new ClientRegistrierung(this);
+	}
+
+	public void registrieren()
+	{
+		//Serialisierung
+		if(registrierung.getTextField_passwort().getText() != null && registrierung.getTextField_passwortBestaetigung().getText() != null && registrierung.getTextField_nickname().getText() != null && registrierung.getTextField_emailadresse().getText() != null)
+		{
+			if(registrierung.getTextField_passwort().getText().equals(registrierung.getTextField_passwortBestaetigung().getText()))
+			{
+				Nickname n = new Nickname(registrierung.getTextField_emailadresse().getText(), registrierung.getTextField_nickname().getText(), registrierung.getTextField_passwort().getText());
+				
+				//#TODO
+				//Nickname verschlüsseln && an Datenbank/Server senden zwecks abgleich (Email schon vorhanden)
+				
+				//über anderen Port verschicken? (verbinden methode)
+				
+			}
+			else
+			{
+				JOptionPane.showMessageDialog(null,"Passwörter stimmen nicht überein.","Fehler", JOptionPane.PLAIN_MESSAGE);
+			}
+		}
+		else
+		{
+			JOptionPane.showMessageDialog(null,"Bitte füllen Sie alle Felder aus.","Fehler", JOptionPane.PLAIN_MESSAGE);
+		}
+
+		
+		
+		this.clientGui = new ClientGui(this);
 	}
 }
