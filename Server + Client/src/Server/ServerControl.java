@@ -105,5 +105,9 @@ public class ServerControl extends Thread
 			}
 		}
 	}
+	public void sendeWarnung(ClientProxy p)
+	{
+		p.sendeNachricht(new Nachricht("Server","Nicht so schnell!"));
+	}
 	
 }

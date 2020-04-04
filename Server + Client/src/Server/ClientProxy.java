@@ -19,6 +19,7 @@ public class ClientProxy implements Runnable
 	private Socket aSocket;
 	private ObjectInputStream in;
 	private ObjectOutputStream out;
+	private Spamschutz timer;
 	protected Thread t;
 	static int benutzer = 0;
 	
@@ -27,6 +28,8 @@ public class ClientProxy implements Runnable
 	{
 		this.aServer = control;
 		this.aSocket = s;
+		this.timer = new Spamschutz();
+		timer.setzeZeit();
 		benutzer++;
 		
 		try
@@ -50,6 +53,7 @@ public class ClientProxy implements Runnable
 	public void run()
 	{
 		System.out.println("Client wurde angemeldet!");
+		
 		while(!t.isInterrupted())
 		{
 			try
@@ -72,9 +76,15 @@ public class ClientProxy implements Runnable
 			Nachricht n = (Nachricht) in.readObject();
 			if(n != null)
 			{
-				verarbeiteNachricht(n);
+				if(timer.checkErlaubt())
+				{
+					verarbeiteNachricht(n);
+				}
+				else
+				{
+					aServer.sendeWarnung(this);		
+				}		
 			}
-			
 		} catch (ClassNotFoundException e)
 		{
 			// TODO Auto-generated catch block
@@ -98,8 +108,8 @@ public class ClientProxy implements Runnable
 	{
 		try
 		{
-			out.writeObject(s);
-			out.flush();
+				out.writeObject(s);
+				out.flush();
 		} catch (IOException e)
 		{
 			// TODO Auto-generated catch block
