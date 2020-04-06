@@ -24,12 +24,15 @@ public class ClientAnmeldung extends JFrame
 	
 	public ClientAnmeldung(ClientControl control)
 	{
-		initialize();
 		this.control = control;
+		initialize();
+		
 	}
 	
 	public void initialize()
 	{
+		control.clientStart();
+		
 		setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 		setBounds(100, 100, 450, 300);
 		contentPane = new JPanel();
@@ -52,7 +55,7 @@ public class ClientAnmeldung extends JFrame
 		{
 			public void actionPerformed(ActionEvent e)
 			{
-				//#TODO
+				control.clientAnmelden();
 			}
 		});
 		btn_anmelden.setBounds(10, 120, 89, 23);
@@ -78,5 +81,25 @@ public class ClientAnmeldung extends JFrame
 		contentPane.add(lblNewLabel_1);
 		
 		setVisible(true);
+	}
+
+	public JTextField getTextField_emailadresse()
+	{
+		return textField_emailadresse;
+	}
+
+	public void setTextField_emailadresse(JTextField textField_emailadresse)
+	{
+		this.textField_emailadresse = textField_emailadresse;
+	}
+
+	public JTextField getTextField_passwort()
+	{
+		return textField_passwort;
+	}
+
+	public void setTextField_passwort(JTextField textField_passwort)
+	{
+		this.textField_passwort = textField_passwort;
 	}
 }

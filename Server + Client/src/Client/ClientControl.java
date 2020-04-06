@@ -39,14 +39,13 @@ public class ClientControl implements Runnable
 	public ClientControl()
 	{
 		this.anmeldung = new ClientAnmeldung(this);
-		clientGui.getList().setModel(nachrichten);
 	}
 	
 	public void clientStart()
 	{
 		try
 		{
-			this.name = clientGui.getTextField().getText();
+			this.name = "";
 			verbinden(ip,port);
 		}
 		catch(UnknownHostException e)
@@ -95,55 +94,88 @@ public class ClientControl implements Runnable
 	
 	public void empfangeNachricht()
 	{
-		Nachricht n = null;
 		try
 		{
-			if((n =(Nachricht) oin.readObject()) != null)
+			Object o = oin.readObject();
+			Transport t = (Transport) o;
+			
+			if(t != null)
 			{
-				nachrichten.addElement(n.getName() +": " + n.getNachricht());
+				//verarbeiteNachricht entfernt, weil unnötig ÄNDERUNG
+				switch(t.getIdentifier())
+				{
+					case "Nachricht":
+						Nachricht n = (Nachricht) o;
+						nachrichten.addElement(n.getName() + ": " + n.getNachricht());
+						break;
+					case "AnmeldeBestaetigung": 
+						AnmeldeBestaetigung a = (AnmeldeBestaetigung) o;
+						this.clientGui = new ClientGui(this);
+						
+						if(registrierung != null)
+						{
+							registrierung.dispose();
+						}
+						if(anmeldung != null)
+						{
+							anmeldung.dispose();
+						}
+						
+						clientGui.getList().setModel(nachrichten);
+						break;
+					default: break;
+				}
 			}
-		} catch (ClassNotFoundException e)
+		}
+		catch (Exception e)
 		{
-			// TODO Auto-generated catch block
 			e.printStackTrace();
-		} catch (IOException e)
+		}
+	}
+	
+	//vorher sendeNachricht mit übergabe von String(Pfusch) Änderung
+	public void sendeObject(Object o)
+	{
+		try
+		{
+			oout.writeObject(o);
+			oout.flush();
+		}
+		catch (IOException e)
 		{
 			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
 	}
 	
-	public void sendeNachricht(String s)
+	public Nachricht createNachricht(String s) //Änderung
 	{
-		try
-		{
-			oout.writeObject(new Nachricht(name,clientGui.getTextFieldNachricht().getText()));
-			oout.flush();
-		} catch (IOException e)
-		{
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		}
+		return new Nachricht(name, s, "Nachricht");
 	}
 	
 	public void oeffneRegistrierung()
 	{
 		this.registrierung = new ClientRegistrierung(this);
+		anmeldung.dispose();
 	}
 
 	public void registrieren()
 	{
-		//Serialisierung
-		if(registrierung.getTextField_passwort().getText() != null && registrierung.getTextField_passwortBestaetigung().getText() != null && registrierung.getTextField_nickname().getText() != null && registrierung.getTextField_emailadresse().getText() != null)
+		String pw = registrierung.getTextField_passwort().getText();
+		String pwBestaetigung = registrierung.getTextField_passwortBestaetigung().getText();
+		String nickname = registrierung.getTextField_nickname().getText();
+		String email = registrierung.getTextField_emailadresse().getText();
+		
+		if(pw != null && pwBestaetigung != null && nickname != null && email != null)
 		{
-			if(registrierung.getTextField_passwort().getText().equals(registrierung.getTextField_passwortBestaetigung().getText()))
+			if(pw.equals(pwBestaetigung))
 			{
-				Nickname n = new Nickname(registrierung.getTextField_emailadresse().getText(), registrierung.getTextField_nickname().getText(), registrierung.getTextField_passwort().getText());
+				Nickname n = new Nickname("Nickname", email, nickname, pw);
+
+				sendeObject(n);
 				
 				//#TODO
-				//Nickname verschlüsseln && an Datenbank/Server senden zwecks abgleich (Email schon vorhanden)
-				
-				//über anderen Port verschicken? (verbinden methode)
+				//Nickname verschlüsseln && an Datenbank/Server senden zwecks abgleich (Email schon vorhanden?)
 				
 			}
 			else
@@ -155,9 +187,22 @@ public class ClientControl implements Runnable
 		{
 			JOptionPane.showMessageDialog(null,"Bitte füllen Sie alle Felder aus.","Fehler", JOptionPane.PLAIN_MESSAGE);
 		}
-
+	}
+	
+	public void clientAnmelden()
+	{
+		String pw = anmeldung.getTextField_passwort().getText();
+		String email = anmeldung.getTextField_emailadresse().getText();
 		
-		
-		this.clientGui = new ClientGui(this);
+		if(pw != null && email != null)
+		{
+			AnmeldeObjekt ao = new AnmeldeObjekt(email, pw);
+			
+			sendeObject(ao);
+		}
+		else
+		{
+			JOptionPane.showMessageDialog(null,"Bitte füllen Sie alle Felder aus.","Fehler", JOptionPane.PLAIN_MESSAGE);
+		}
 	}
 }

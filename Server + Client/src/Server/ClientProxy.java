@@ -9,7 +9,11 @@ import java.io.ObjectOutputStream;
 import java.io.OutputStream;
 import java.io.PrintWriter;
 import java.net.Socket;
+
+import Client.AnmeldeObjekt;
 import Client.Nachricht;
+import Client.Nickname;
+import Client.Transport;
 
 
 public class ClientProxy implements Runnable
@@ -66,39 +70,43 @@ public class ClientProxy implements Runnable
 	
 	private void empfangeNachricht()
 	{
-		
 		try
 		{
-			Nachricht n = (Nachricht) in.readObject();
-			if(n != null)
-			{
-				verarbeiteNachricht(n);
-			}
+			Object o = (Object) in.readObject();
+			Transport t = (Transport) o;
 			
-		} catch (ClassNotFoundException e)
+			if(t != null)
+			{
+				//verarbeiteNachricht entfernt, weil unnötig ÄNDERUNG
+				switch(t.getIdentifier())
+				{
+					case "Nachricht":
+						Nachricht n = (Nachricht) o;
+						aServer.bearbeiteNachricht(n);
+						break;
+					case "Nickname": 
+						Nickname nick = (Nickname) o;
+						aServer.registrierungPruefen(nick);
+						break;
+					case "AnmeldeObjekt":
+						AnmeldeObjekt ao = (AnmeldeObjekt) o;
+						aServer.anmelden(ao);
+						break;
+					default: break;
+				}
+			}
+		}
+		catch (Exception e)
 		{
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		} catch (IOException e)
-		{
-			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
 	}
 	
-	public void verarbeiteNachricht(Nachricht s)
-	{
-		if(s!=null)
-		{
-			aServer.bearbeiteNachricht(s);
-		}
-	}
-	
-	public void sendeNachricht(Nachricht s)
+	public void sendeObject(Object o) //Änderung: Vorher SendeNachricht
 	{
 		try
 		{
-			out.writeObject(s);
+			out.writeObject(o);
 			out.flush();
 		} catch (IOException e)
 		{

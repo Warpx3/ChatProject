@@ -9,6 +9,9 @@ import java.io.Serializable;
 import java.net.ServerSocket;
 import java.net.SocketTimeoutException;
 import java.util.ArrayList;
+
+import Client.AnmeldeBestaetigung;
+import Client.AnmeldeObjekt;
 import Client.Nachricht;
 import Client.Nickname;
 
@@ -102,33 +105,21 @@ public class ServerControl extends Thread implements Serializable
 		socket = null;
 	}
 	
-	public void bearbeiteNachricht(Nachricht s)
-	{
-		if(s != null)
+	public void bearbeiteNachricht(Nachricht n)
+	{	
+		if(n != null)
 		{
 			for(ClientProxy c : liste)
 			{
-				c.sendeNachricht(s);
+				c.sendeObject(n);
 			}
 		}
 	}
 	
 	public void registrierungPruefen(Nickname n)
-	{
+	{	
 		boolean flag = false;
-		
-		//Serialisierung
-		try(FileOutputStream fos = new FileOutputStream("datei.ser");
-				ObjectOutputStream oos = new ObjectOutputStream(fos))
-		{
-			oos.writeObject(n);
-		}
-		catch(Exception ex)
-		{
-			ex.printStackTrace();
-		}
-		
-		
+	
 		//Deserialisierung
 		try(FileInputStream fis = new FileInputStream("datei.ser");
 				ObjectInputStream ois = new ObjectInputStream(fis))
@@ -144,9 +135,8 @@ public class ServerControl extends Thread implements Serializable
 		{
 			if(nick.getEmail().equals(n.getEmail()))
 			{
-				//#TODO
-				//Abbruch
 				flag = true;
+				//TODO
 				//Benutzer das auch wissen lassen
 			}
 			
@@ -154,8 +144,44 @@ public class ServerControl extends Thread implements Serializable
 		
 		if(flag == false)
 		{
-			//#TODO
-			//Benutzer anmelden
+			//Benutzer registrieren
+			//Serialisierung
+			try(FileOutputStream fos = new FileOutputStream("datei.ser");
+					ObjectOutputStream oos = new ObjectOutputStream(fos))
+			{
+				nicknameListe.add(n);
+				oos.writeObject(nicknameListe);
+			}
+			catch(Exception ex)
+			{
+				ex.printStackTrace();
+			}
+		
+			anmelden(new AnmeldeObjekt(n.getEmail(), n.getPasswort()));
+		}
+	}
+	
+	public void anmelden(AnmeldeObjekt n)
+	{
+		//Deserialisierung
+		try(FileInputStream fis = new FileInputStream("datei.ser");
+				ObjectInputStream ois = new ObjectInputStream(fis))
+		{
+			nicknameListe = (ArrayList<Nickname>) ois.readObject();
+		}
+		catch(Exception ex)
+		{
+			ex.printStackTrace();
+		}
+		
+		for(Nickname nick : nicknameListe)
+		{			
+			if(nick.getEmail().equals(n.getEmail()) && nick.getPasswort().equals(n.getPasswort()))
+			{
+				//Benutzer vorhanden, an Proxy senden
+				p.sendeObject(new AnmeldeBestaetigung(true, nick.getName()));
+			}
+			
 		}
 	}
 }

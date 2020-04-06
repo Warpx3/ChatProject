@@ -60,7 +60,7 @@ public class ClientGui extends JFrame
 			btnSenden = new JButton("Senden");
 			btnSenden.setBounds(335, 219, 89, 23);
 			btnSenden.addActionListener(e->{
-				client.sendeNachricht(getTextFieldNachricht().getText());
+				client.sendeObject(client.createNachricht(getTextFieldNachricht().getText()));
 			});
 		}
 		return btnSenden;

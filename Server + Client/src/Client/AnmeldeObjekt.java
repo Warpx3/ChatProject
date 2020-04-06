@@ -2,18 +2,15 @@ package Client;
 
 import java.io.Serializable;
 
-public class Nickname extends Transport implements Serializable
+public class AnmeldeObjekt extends Transport implements Serializable
 {
-	private static final long serialVersionUID = 1L;
 	private String email;
-	private String name;
 	private String passwort;
-
-	public Nickname(String identifier, String email, String name, String passwort)
+	
+	public AnmeldeObjekt(String email, String passwort)
 	{
-		super("Nickname");
+		super("AnmeldeObjekt");
 		this.email = email;
-		this.name = name;
 		this.passwort = passwort;
 	}
 
@@ -27,16 +24,6 @@ public class Nickname extends Transport implements Serializable
 		this.email = email;
 	}
 
-	public String getName()
-	{
-		return name;
-	}
-
-	public void setName(String name)
-	{
-		this.name = name;
-	}
-
 	public String getPasswort()
 	{
 		return passwort;
@@ -47,4 +34,5 @@ public class Nickname extends Transport implements Serializable
 		this.passwort = passwort;
 	}
 
+	
 }
