@@ -8,7 +8,7 @@ public class Nachricht extends Transport implements Serializable
 	private String name;
 	private String nachricht;
 	
-	public Nachricht(String identifier, String name, String nachricht)
+	public Nachricht(String name, String nachricht)
 	{
 		super("Nachricht");
 		this.name = name;

@@ -110,6 +110,7 @@ public class ClientControl implements Runnable
 						break;
 					case "AnmeldeBestaetigung": 
 						AnmeldeBestaetigung a = (AnmeldeBestaetigung) o;
+						name = a.getNickname();
 						this.clientGui = new ClientGui(this);
 						
 						if(registrierung != null)
@@ -150,7 +151,7 @@ public class ClientControl implements Runnable
 	
 	public Nachricht createNachricht(String s) //Änderung
 	{
-		return new Nachricht(name, s, "Nachricht");
+		return new Nachricht(name, s);
 	}
 	
 	public void oeffneRegistrierung()

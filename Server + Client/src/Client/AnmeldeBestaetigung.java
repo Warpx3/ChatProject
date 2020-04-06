@@ -14,4 +14,11 @@ public class AnmeldeBestaetigung extends Transport implements Serializable
 		this.erfolgreichAngemeldet = erfolgreichAngemeldet;
 		this.nickname = nickname;
 	}
+
+	public String getNickname()
+	{
+		return nickname;
+	}
+	
+	
 }
