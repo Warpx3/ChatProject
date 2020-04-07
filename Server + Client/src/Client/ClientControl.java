@@ -101,7 +101,6 @@ public class ClientControl implements Runnable
 			
 			if(t != null)
 			{
-				//verarbeiteNachricht entfernt, weil unnötig ÄNDERUNG
 				switch(t.getIdentifier())
 				{
 					case "Nachricht":
@@ -134,7 +133,6 @@ public class ClientControl implements Runnable
 		}
 	}
 	
-	//vorher sendeNachricht mit übergabe von String(Pfusch) Änderung
 	public void sendeObject(Object o)
 	{
 		try
@@ -144,12 +142,11 @@ public class ClientControl implements Runnable
 		}
 		catch (IOException e)
 		{
-			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
 	}
 	
-	public Nachricht createNachricht(String s) //Änderung
+	public Nachricht createNachricht(String s)
 	{
 		return new Nachricht(name, s);
 	}

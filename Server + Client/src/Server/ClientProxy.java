@@ -77,7 +77,6 @@ public class ClientProxy implements Runnable
 			
 			if(t != null)
 			{
-				//verarbeiteNachricht entfernt, weil unnötig ÄNDERUNG
 				switch(t.getIdentifier())
 				{
 					case "Nachricht":
@@ -110,7 +109,6 @@ public class ClientProxy implements Runnable
 			out.flush();
 		} catch (IOException e)
 		{
-			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
 	}
