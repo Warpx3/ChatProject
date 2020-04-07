@@ -12,6 +12,7 @@ import java.net.Socket;
 import java.net.UnknownHostException;
 
 import javax.swing.DefaultListModel;
+import javax.swing.JOptionPane;
 
 public class ClientControl implements Runnable
 {
@@ -29,21 +30,22 @@ public class ClientControl implements Runnable
 	private DefaultListModel<String> nachrichten = new DefaultListModel<String>();
 	
 	private ClientGui clientGui;
+	private ClientAnmeldung anmeldung;
+	private ClientRegistrierung registrierung;
 	
 	private Thread t;
 	
 	
 	public ClientControl()
 	{
-		this.clientGui = new ClientGui(this);
-		clientGui.getList().setModel(nachrichten);
+		this.anmeldung = new ClientAnmeldung(this);
 	}
 	
 	public void clientStart()
 	{
 		try
 		{
-			this.name = clientGui.getTextField().getText();
+			this.name = "";
 			verbinden(ip,port);
 		}
 		catch(UnknownHostException e)
@@ -92,34 +94,113 @@ public class ClientControl implements Runnable
 	
 	public void empfangeNachricht()
 	{
-		Nachricht n = null;
 		try
 		{
-			if((n =(Nachricht) oin.readObject()) != null)
+			Object o = oin.readObject();
+			Transport t = (Transport) o;
+			
+			if(t != null)
 			{
-				nachrichten.addElement(n.getName() +": " + n.getNachricht());
+				switch(t.getIdentifier())
+				{
+					case "Nachricht":
+						Nachricht n = (Nachricht) o;
+						nachrichten.addElement(n.getName() + ": " + n.getNachricht());
+						break;
+					case "AnmeldeBestaetigung": 
+						AnmeldeBestaetigung a = (AnmeldeBestaetigung) o;
+						name = a.getNickname();
+						this.clientGui = new ClientGui(this);
+						
+						if(registrierung != null)
+						{
+							registrierung.dispose();
+						}
+						if(anmeldung != null)
+						{
+							anmeldung.dispose();
+						}
+						
+						clientGui.getList().setModel(nachrichten);
+						break;
+					default: break;
+				}
 			}
-		} catch (ClassNotFoundException e)
+		}
+		catch (Exception e)
 		{
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		} catch (IOException e)
-		{
-			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
 	}
 	
-	public void sendeNachricht(String s)
+	public void sendeObject(Object o)
 	{
 		try
 		{
-			oout.writeObject(new Nachricht(name,clientGui.getTextFieldNachricht().getText()));
+			oout.writeObject(o);
 			oout.flush();
-		} catch (IOException e)
+		}
+		catch (IOException e)
 		{
-			// TODO Auto-generated catch block
 			e.printStackTrace();
+		}
+	}
+	
+	public Nachricht createNachricht(String s)
+	{
+		return new Nachricht(name, s);
+	}
+	
+	public void oeffneRegistrierung()
+	{
+		this.registrierung = new ClientRegistrierung(this);
+		anmeldung.dispose();
+	}
+
+	public void registrieren()
+	{
+		String pw = registrierung.getTextField_passwort().getText();
+		String pwBestaetigung = registrierung.getTextField_passwortBestaetigung().getText();
+		String nickname = registrierung.getTextField_nickname().getText();
+		String email = registrierung.getTextField_emailadresse().getText();
+		
+		if(pw != null && pwBestaetigung != null && nickname != null && email != null)
+		{
+			if(pw.equals(pwBestaetigung))
+			{
+				Nickname n = new Nickname("Nickname", email, nickname, pw);
+
+				sendeObject(n);
+				
+				//#TODO
+				//Nickname verschlüsseln && an Datenbank/Server senden zwecks abgleich (Email schon vorhanden?)
+				
+			}
+			else
+			{
+				JOptionPane.showMessageDialog(null,"Passwörter stimmen nicht überein.","Fehler", JOptionPane.PLAIN_MESSAGE);
+			}
+		}
+		else
+		{
+			JOptionPane.showMessageDialog(null,"Bitte füllen Sie alle Felder aus.","Fehler", JOptionPane.PLAIN_MESSAGE);
+		}
+	}
+	
+	public void clientAnmelden()
+	{
+		String pw = anmeldung.getTextField_passwort().getText();
+		String email = anmeldung.getTextField_emailadresse().getText();
+		
+		if(pw != null && email != null)
+		{
+			AnmeldeObjekt ao = new AnmeldeObjekt(email, pw);
+			
+			sendeObject(ao);
+		}
+		else
+		{
+			JOptionPane.showMessageDialog(null,"Bitte füllen Sie alle Felder aus.","Fehler", JOptionPane.PLAIN_MESSAGE);
 		}
 	}
 }

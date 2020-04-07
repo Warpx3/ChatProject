@@ -15,14 +15,11 @@ public class ClientGui extends JFrame
 {
 
 	private JPanel contentPane;
-	private JButton btnConnecten;
 	private JButton btnSenden;
 	private JTextField textFieldNachricht;
 	private JList list;
 	
 	private ClientControl client;
-	private JTextField textField;
-	private JLabel lblName;
 
 	public ClientGui(ClientControl client)
 	{
@@ -38,29 +35,16 @@ public class ClientGui extends JFrame
 		contentPane.setBorder(new EmptyBorder(5, 5, 5, 5));
 		setContentPane(contentPane);
 		contentPane.setLayout(null);
-		contentPane.add(getBtnConnecten());
 		contentPane.add(getBtnSenden());
 		contentPane.add(getTextFieldNachricht());
 		contentPane.add(getList());
-		contentPane.add(getTextField());
-		contentPane.add(getLblName());
-	}
-	private JButton getBtnConnecten() {
-		if (btnConnecten == null) {
-			btnConnecten = new JButton("Connecten");
-			btnConnecten.setBounds(201, 11, 124, 23);
-			btnConnecten.addActionListener(e->{
-				client.clientStart();
-			});
-		}
-		return btnConnecten;
 	}
 	private JButton getBtnSenden() {
 		if (btnSenden == null) {
 			btnSenden = new JButton("Senden");
 			btnSenden.setBounds(335, 219, 89, 23);
 			btnSenden.addActionListener(e->{
-				client.sendeNachricht(getTextFieldNachricht().getText());
+				client.sendeObject(client.createNachricht(getTextFieldNachricht().getText()));
 			});
 		}
 		return btnSenden;
@@ -76,23 +60,8 @@ public class ClientGui extends JFrame
 	protected JList getList() {
 		if (list == null) {
 			list = new JList();
-			list.setBounds(10, 45, 315, 164);
+			list.setBounds(10, 11, 414, 198);
 		}
 		return list;
-	}
-	protected JTextField getTextField() {
-		if (textField == null) {
-			textField = new JTextField();
-			textField.setBounds(60, 12, 131, 20);
-			textField.setColumns(10);
-		}
-		return textField;
-	}
-	private JLabel getLblName() {
-		if (lblName == null) {
-			lblName = new JLabel("Name:");
-			lblName.setBounds(10, 15, 75, 14);
-		}
-		return lblName;
 	}
 }

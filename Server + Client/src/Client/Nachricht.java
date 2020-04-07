@@ -2,22 +2,19 @@ package Client;
 
 import java.io.Serializable;
 
-public class Nachricht implements Serializable
+public class Nachricht extends Transport implements Serializable
 {
-	/**
-	 * 
-	 */
 	private static final long serialVersionUID = 1L;
 	private String name;
 	private String nachricht;
 	
-
 	public Nachricht(String name, String nachricht)
 	{
+		super("Nachricht");
 		this.name = name;
 		this.nachricht = nachricht;
 	}
-	
+
 	public String getName()
 	{
 		return name;
@@ -38,7 +35,6 @@ public class Nachricht implements Serializable
 		this.nachricht = nachricht;
 	}
 
-	
 	@Override
 	public String toString()
 	{
