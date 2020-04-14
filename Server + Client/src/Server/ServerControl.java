@@ -10,6 +10,8 @@ import java.net.ServerSocket;
 import java.net.SocketTimeoutException;
 import java.util.ArrayList;
 
+import javax.swing.DefaultListModel;
+
 import Client.AnmeldeBestaetigung;
 import Client.AnmeldeObjekt;
 import Client.Nachricht;
@@ -24,11 +26,15 @@ public class ServerControl extends Thread implements Serializable
 	private int port = 8008;
 	private ServerSocket socket;
 	
+	private DefaultListModel<String> angemeldeteNutzer;
+	
 	private ServerGui serverGui;
 	
 	public ServerControl()
 	{
 		this.serverGui = new ServerGui(this);
+		angemeldeteNutzer = new DefaultListModel<>();
+		serverGui.getList_angemeldeteUser().setModel(angemeldeteNutzer);
 	}
 	
 	public void starteServer()
@@ -178,10 +184,23 @@ public class ServerControl extends Thread implements Serializable
 		{			
 			if(nick.getEmail().equals(n.getEmail()) && nick.getPasswort().equals(n.getPasswort()))
 			{
+				angemeldeteNutzer.addElement(nick.getEmail());
 				//Benutzer vorhanden, an Proxy senden
 				p.sendeObject(new AnmeldeBestaetigung(true, nick.getName()));
 			}
 			
 		}
 	}
+	
+	public DefaultListModel<String> getAngemeldeteNutzer()
+	{
+		return angemeldeteNutzer;
+	}
+
+	public void setAngemeldeteNutzer(DefaultListModel<String> angemeldeteNutzer)
+	{
+		this.angemeldeteNutzer = angemeldeteNutzer;
+	}
+	
+	
 }

@@ -23,6 +23,8 @@ public class ClientProxy implements Runnable
 	private Socket aSocket;
 	private ObjectInputStream in;
 	private ObjectOutputStream out;
+	private Nickname nick;
+	private AnmeldeObjekt ao;
 	protected Thread t;
 	static int benutzer = 0;
 	
@@ -35,10 +37,8 @@ public class ClientProxy implements Runnable
 		
 		try
 		{
-			
 			this.in = new ObjectInputStream(aSocket.getInputStream());
 			this.out = new ObjectOutputStream(aSocket.getOutputStream());
-			
 			
 			t = new Thread(this);
 			t.start();
@@ -84,11 +84,11 @@ public class ClientProxy implements Runnable
 						aServer.bearbeiteNachricht(n);
 						break;
 					case "Nickname": 
-						Nickname nick = (Nickname) o;
+						nick = (Nickname) o;
 						aServer.registrierungPruefen(nick);
 						break;
 					case "AnmeldeObjekt":
-						AnmeldeObjekt ao = (AnmeldeObjekt) o;
+						ao = (AnmeldeObjekt) o;
 						aServer.anmelden(ao);
 						break;
 					default: break;
@@ -97,7 +97,16 @@ public class ClientProxy implements Runnable
 		}
 		catch (Exception e)
 		{
-			e.printStackTrace();
+			//e.printStackTrace();
+			if(nick != null)
+			{
+				aServer.getAngemeldeteNutzer().removeElement(nick.getEmail());
+			}
+			else
+			{
+				aServer.getAngemeldeteNutzer().removeElement(ao.getEmail());
+			}
+			this.t.interrupt();
 		}
 	}
 	

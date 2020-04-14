@@ -168,7 +168,7 @@ public class ClientControl implements Runnable
 		{
 			if(pw.equals(pwBestaetigung))
 			{
-				Nickname n = new Nickname("Nickname", email, nickname, pw);
+				Nickname n = new Nickname(email, nickname, pw);
 
 				sendeObject(n);
 				

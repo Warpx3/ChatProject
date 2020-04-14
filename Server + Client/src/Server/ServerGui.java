@@ -7,6 +7,8 @@ import javax.swing.JFrame;
 import javax.swing.JPanel;
 import javax.swing.border.EmptyBorder;
 import javax.swing.JButton;
+import javax.swing.JList;
+import javax.swing.JLabel;
 
 public class ServerGui extends JFrame
 {
@@ -14,6 +16,7 @@ public class ServerGui extends JFrame
 	private JPanel contentPane;
 	private JButton btnStartServer;
 	private JButton btnStopServer;
+	private JList list_angemeldeteUser;
 
 	private ServerControl server;
 	
@@ -33,6 +36,14 @@ public class ServerGui extends JFrame
 		contentPane.setLayout(null);
 		contentPane.add(getBtnStartServer());
 		contentPane.add(getBtnStopServer());
+		
+		list_angemeldeteUser = new JList();
+		list_angemeldeteUser.setBounds(136, 33, 288, 217);
+		contentPane.add(list_angemeldeteUser);
+		
+		JLabel lblAngemeldeteUser = new JLabel("angemeldete User:");
+		lblAngemeldeteUser.setBounds(137, 15, 138, 14);
+		contentPane.add(lblAngemeldeteUser);
 	}
 	private JButton getBtnStartServer() {
 		if (btnStartServer == null) {
@@ -54,4 +65,14 @@ public class ServerGui extends JFrame
 		}
 		return btnStopServer;
 	}
+	public JList getList_angemeldeteUser()
+	{
+		return list_angemeldeteUser;
+	}
+	public void setList_angemeldeteUser(JList list_angemeldeteUser)
+	{
+		this.list_angemeldeteUser = list_angemeldeteUser;
+	}
+	
+	
 }

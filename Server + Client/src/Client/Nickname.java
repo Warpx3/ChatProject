@@ -9,7 +9,7 @@ public class Nickname extends Transport implements Serializable
 	private String name;
 	private String passwort;
 
-	public Nickname(String identifier, String email, String name, String passwort)
+	public Nickname(String email, String name, String passwort)
 	{
 		super("Nickname");
 		this.email = email;
@@ -45,6 +45,12 @@ public class Nickname extends Transport implements Serializable
 	public void setPasswort(String passwort)
 	{
 		this.passwort = passwort;
+	}
+
+	@Override
+	public String toString()
+	{
+		return email;
 	}
 
 }
