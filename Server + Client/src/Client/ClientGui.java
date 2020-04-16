@@ -18,7 +18,8 @@ public class ClientGui extends JFrame
 	private JButton btnSenden;
 	private JTextField textFieldNachricht;
 	private JList list;
-	
+	private JList list_angemeldeteNutzer;
+
 	private ClientControl client;
 
 	public ClientGui(ClientControl client)
@@ -27,10 +28,12 @@ public class ClientGui extends JFrame
 		this.client = client;
 		setVisible(true);
 	}
-	private void initialize() {
+
+	private void initialize()
+	{
 		setTitle("Client");
 		setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-		setBounds(100, 100, 451, 290);
+		setBounds(100, 100, 577, 286);
 		contentPane = new JPanel();
 		contentPane.setBorder(new EmptyBorder(5, 5, 5, 5));
 		setContentPane(contentPane);
@@ -38,30 +41,50 @@ public class ClientGui extends JFrame
 		contentPane.add(getBtnSenden());
 		contentPane.add(getTextFieldNachricht());
 		contentPane.add(getList());
+		contentPane.add(getList_angemeldeteNutzer());
 	}
-	private JButton getBtnSenden() {
-		if (btnSenden == null) {
+
+	private JButton getBtnSenden()
+	{
+		if (btnSenden == null)
+		{
 			btnSenden = new JButton("Senden");
 			btnSenden.setBounds(335, 219, 89, 23);
-			btnSenden.addActionListener(e->{
+			btnSenden.addActionListener(e -> {
 				client.sendeObject(client.createNachricht(getTextFieldNachricht().getText()));
 			});
 		}
 		return btnSenden;
 	}
-	protected JTextField getTextFieldNachricht() {
-		if (textFieldNachricht == null) {
+
+	protected JTextField getTextFieldNachricht()
+	{
+		if (textFieldNachricht == null)
+		{
 			textFieldNachricht = new JTextField();
 			textFieldNachricht.setBounds(10, 220, 315, 20);
 			textFieldNachricht.setColumns(10);
 		}
 		return textFieldNachricht;
 	}
-	protected JList getList() {
-		if (list == null) {
+
+	protected JList getList()
+	{
+		if (list == null)
+		{
 			list = new JList();
 			list.setBounds(10, 11, 414, 198);
 		}
 		return list;
+	}
+
+	protected JList getList_angemeldeteNutzer()
+	{
+		if (list_angemeldeteNutzer == null)
+		{
+			list_angemeldeteNutzer = new JList();
+			list_angemeldeteNutzer.setBounds(434, 11, 117, 225);
+		}
+		return list_angemeldeteNutzer;
 	}
 }

@@ -12,6 +12,7 @@ import java.util.ArrayList;
 
 import javax.swing.DefaultListModel;
 
+import Client.AktiveNutzer;
 import Client.AnmeldeBestaetigung;
 import Client.AnmeldeObjekt;
 import Client.Nachricht;
@@ -26,15 +27,17 @@ public class ServerControl extends Thread implements Serializable
 	private int port = 8008;
 	private ServerSocket socket;
 	
-	private DefaultListModel<String> angemeldeteNutzer;
+	private static DefaultListModel<Nickname> angemeldeteNutzer;
 	
 	private ServerGui serverGui;
+	private AktiveNutzer aktiveNutzer;
 	
 	public ServerControl()
 	{
 		this.serverGui = new ServerGui(this);
 		angemeldeteNutzer = new DefaultListModel<>();
 		serverGui.getList_angemeldeteUser().setModel(angemeldeteNutzer);
+		aktiveNutzer = new AktiveNutzer();
 	}
 	
 	public void starteServer()
@@ -111,15 +114,25 @@ public class ServerControl extends Thread implements Serializable
 		socket = null;
 	}
 	
-	public void bearbeiteNachricht(Nachricht n)
+	public void broadcast(Object o) //bearbeiteNachricht wollen wir nicht nur für Nachrichten, sondern allgemein als broadcast verwenden
 	{	
-		if(n != null)
+		if(o != null)
 		{
 			for(ClientProxy c : liste)
 			{
-				c.sendeObject(n);
+				c.sendeObject(o);
 			}
 		}
+	}
+	
+	public void notifyObserver()
+	{	
+		aktiveNutzer.setBenutzer(angemeldeteNutzer);
+		for(int i = 0; i < aktiveNutzer.getBenutzer().getSize(); i++)
+		{
+			System.out.println(i + ": aktiveNutzer: " + aktiveNutzer.getBenutzer().get(i));
+		}
+		broadcast(aktiveNutzer);
 	}
 	
 	public void registrierungPruefen(Nickname n)
@@ -184,22 +197,45 @@ public class ServerControl extends Thread implements Serializable
 		{			
 			if(nick.getEmail().equals(n.getEmail()) && nick.getPasswort().equals(n.getPasswort()))
 			{
-				angemeldeteNutzer.addElement(nick.getEmail());
+				angemeldeteNutzer.addElement(new Nickname(nick.getEmail(), nick.getName()));
 				//Benutzer vorhanden, an Proxy senden
 				p.sendeObject(new AnmeldeBestaetigung(true, nick.getName()));
+				notifyObserver();
 			}
 			
 		}
 	}
 	
-	public DefaultListModel<String> getAngemeldeteNutzer()
+	public void aktivenBenutzerEntfernen(String email)
+	{
+		System.out.println("hui");
+		for(int i = 0; i < angemeldeteNutzer.getSize(); i++)
+		{
+			if(angemeldeteNutzer.get(i).getEmail().equalsIgnoreCase(email))
+			{
+				angemeldeteNutzer.remove(i);
+			}
+		}
+	}
+	
+	public DefaultListModel<Nickname> getAngemeldeteNutzer()
 	{
 		return angemeldeteNutzer;
 	}
 
-	public void setAngemeldeteNutzer(DefaultListModel<String> angemeldeteNutzer)
+	public void setAngemeldeteNutzer(DefaultListModel<Nickname> angemeldeteNutzer)
 	{
 		this.angemeldeteNutzer = angemeldeteNutzer;
+	}
+
+	public ArrayList<ClientProxy> getListe()
+	{
+		return liste;
+	}
+
+	public void setListe(ArrayList<ClientProxy> liste)
+	{
+		this.liste = liste;
 	}
 	
 	

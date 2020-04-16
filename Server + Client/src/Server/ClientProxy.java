@@ -81,7 +81,7 @@ public class ClientProxy implements Runnable
 				{
 					case "Nachricht":
 						Nachricht n = (Nachricht) o;
-						aServer.bearbeiteNachricht(n);
+						aServer.broadcast(n);
 						break;
 					case "Nickname": 
 						nick = (Nickname) o;
@@ -100,17 +100,18 @@ public class ClientProxy implements Runnable
 			//e.printStackTrace();
 			if(nick != null)
 			{
-				aServer.getAngemeldeteNutzer().removeElement(nick.getEmail());
+				aServer.aktivenBenutzerEntfernen(nick.getEmail());
 			}
 			else
 			{
-				aServer.getAngemeldeteNutzer().removeElement(ao.getEmail());
+				aServer.aktivenBenutzerEntfernen(ao.getEmail());
 			}
+			aServer.notifyObserver();
 			this.t.interrupt();
 		}
 	}
 	
-	public void sendeObject(Object o) //Änderung: Vorher SendeNachricht
+	public void sendeObject(Object o)
 	{
 		try
 		{

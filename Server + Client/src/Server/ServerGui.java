@@ -38,11 +38,11 @@ public class ServerGui extends JFrame
 		contentPane.add(getBtnStopServer());
 		
 		list_angemeldeteUser = new JList();
-		list_angemeldeteUser.setBounds(136, 33, 288, 217);
+		list_angemeldeteUser.setBounds(135, 33, 288, 217);
 		contentPane.add(list_angemeldeteUser);
 		
 		JLabel lblAngemeldeteUser = new JLabel("angemeldete User:");
-		lblAngemeldeteUser.setBounds(137, 15, 138, 14);
+		lblAngemeldeteUser.setBounds(135, 15, 138, 14);
 		contentPane.add(lblAngemeldeteUser);
 	}
 	private JButton getBtnStartServer() {

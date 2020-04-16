@@ -123,6 +123,18 @@ public class ClientControl implements Runnable
 						
 						clientGui.getList().setModel(nachrichten);
 						break;
+					case "aktiveNutzer":
+						AktiveNutzer an = new AktiveNutzer();
+						an = (AktiveNutzer) o;
+						if(an.getBenutzer() != null && an != null)
+						{
+							for(int i = 0; i < an.getBenutzer().getSize(); i++)
+							{
+								System.out.println(i + ": aktiveNutzer: " + an.getBenutzer().get(i));
+							}
+							clientGui.getList_angemeldeteNutzer().setModel(an.getBenutzer());
+						}
+						break;
 					default: break;
 				}
 			}

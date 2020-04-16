@@ -17,6 +17,13 @@ public class Nickname extends Transport implements Serializable
 		this.passwort = passwort;
 	}
 
+	public Nickname(String email, String name)
+	{
+		super("Nickname");
+		this.email = email;
+		this.name = name;
+	}
+	
 	public String getEmail()
 	{
 		return email;
