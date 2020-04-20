@@ -27,7 +27,7 @@ public class ServerControl extends Thread implements Serializable
 	private int port = 8008;
 	private ServerSocket socket;
 	
-	private static DefaultListModel<Nickname> angemeldeteNutzer;
+	private DefaultListModel<Nickname> angemeldeteNutzer;
 	
 	private ServerGui serverGui;
 	private AktiveNutzer aktiveNutzer;
