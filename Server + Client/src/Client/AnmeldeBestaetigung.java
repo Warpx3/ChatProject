@@ -6,16 +6,16 @@ public class AnmeldeBestaetigung extends Transport implements Serializable
 {
 	private static final long serialVersionUID = 1L;
 	private boolean erfolgreichAngemeldet;
-	private String nickname;
+	private Nickname nickname;
 	
-	public AnmeldeBestaetigung(boolean erfolgreichAngemeldet, String nickname)
+	public AnmeldeBestaetigung(boolean erfolgreichAngemeldet, Nickname nickname)
 	{
 		super("AnmeldeBestaetigung");
 		this.erfolgreichAngemeldet = erfolgreichAngemeldet;
 		this.nickname = nickname;
 	}
 
-	public String getNickname()
+	public Nickname getNickname()
 	{
 		return nickname;
 	}

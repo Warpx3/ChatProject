@@ -10,6 +10,8 @@ import javax.swing.JButton;
 import javax.swing.JTextField;
 import javax.swing.JList;
 import javax.swing.JLabel;
+import java.awt.event.MouseAdapter;
+import java.awt.event.MouseEvent;
 
 public class ClientGui extends JFrame
 {
@@ -83,6 +85,15 @@ public class ClientGui extends JFrame
 		if (list_angemeldeteNutzer == null)
 		{
 			list_angemeldeteNutzer = new JList();
+			list_angemeldeteNutzer.addMouseListener(new MouseAdapter()
+			{
+				@Override
+				public void mouseClicked(MouseEvent e)
+				{
+					Nickname nick = new Nickname(((Nickname)list_angemeldeteNutzer.getSelectedValue()).getEmail(), ((Nickname)list_angemeldeteNutzer.getSelectedValue()).getName());
+					client.clientPrivatOeffnen(nick);
+				}
+			});
 			list_angemeldeteNutzer.setBounds(434, 11, 117, 225);
 		}
 		return list_angemeldeteNutzer;

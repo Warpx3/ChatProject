@@ -10,6 +10,7 @@ import java.io.OutputStream;
 import java.io.PrintWriter;
 import java.net.Socket;
 import java.net.UnknownHostException;
+import java.util.ArrayList;
 
 import javax.swing.DefaultListModel;
 import javax.swing.JOptionPane;
@@ -24,17 +25,19 @@ public class ClientControl implements Runnable
 	private ObjectOutputStream oout = null;
 	
 	private String ip = "localhost";
-	private String name = "";
+	private Nickname nickname;
 	private int port = 8008;
 	
 	private DefaultListModel<String> nachrichten = new DefaultListModel<String>();
+	private AktiveNutzer an;
+	
+	private ArrayList<ClientPrivat> privateChatraeume = new ArrayList<>();
 	
 	private ClientGui clientGui;
 	private ClientAnmeldung anmeldung;
 	private ClientRegistrierung registrierung;
 	
 	private Thread t;
-	
 	
 	public ClientControl()
 	{
@@ -45,7 +48,6 @@ public class ClientControl implements Runnable
 	{
 		try
 		{
-			this.name = "";
 			verbinden(ip,port);
 		}
 		catch(UnknownHostException e)
@@ -109,7 +111,7 @@ public class ClientControl implements Runnable
 						break;
 					case "AnmeldeBestaetigung": 
 						AnmeldeBestaetigung a = (AnmeldeBestaetigung) o;
-						name = a.getNickname();
+						nickname = a.getNickname();
 						this.clientGui = new ClientGui(this);
 						
 						if(registrierung != null)
@@ -124,7 +126,7 @@ public class ClientControl implements Runnable
 						clientGui.getList().setModel(nachrichten);
 						break;
 					case "aktiveNutzer":
-						AktiveNutzer an = new AktiveNutzer();
+						//AktiveNutzer an = new AktiveNutzer();
 						an = (AktiveNutzer) o;
 						if(an.getBenutzer() != null && an != null)
 						{
@@ -132,8 +134,14 @@ public class ClientControl implements Runnable
 							{
 								System.out.println(i + ": aktiveNutzer: " + an.getBenutzer().get(i));
 							}
+							
 							clientGui.getList_angemeldeteNutzer().setModel(an.getBenutzer());
 						}
+						an = null;
+						break;
+					case "privateNachricht":
+						PrivateNachricht pn = (PrivateNachricht) o;
+						clientPrivatOeffnen(pn.getAbsender()).modelPrivateNachrichten.addElement(pn);
 						break;
 					default: break;
 				}
@@ -145,6 +153,29 @@ public class ClientControl implements Runnable
 		}
 	}
 	
+	/*private void empfangePrivateNachricht(PrivateNachricht pn)
+	{
+		Boolean flag = true;
+		
+		for(ClientPrivat cp : privateChatraeume)
+		{
+			if(cp.getEmpfaenger().equals(pn.getAbsender()))
+			{
+				flag = false;
+				cp.modelPrivateNachrichten.addElement(pn);
+				cp.toFront();
+			}
+		}
+		
+		if(flag)
+		{
+			ClientPrivat privaterChatraum = new ClientPrivat(this, pn.getAbsender());
+			privateChatraeume.add(privaterChatraum);
+		}
+		
+		clientPrivatOeffnen(pn.getAbsender()).modelPrivateNachrichten.addElement(pn);
+	}*/
+
 	public void sendeObject(Object o)
 	{
 		try
@@ -160,7 +191,7 @@ public class ClientControl implements Runnable
 	
 	public Nachricht createNachricht(String s)
 	{
-		return new Nachricht(name, s);
+		return new Nachricht(nickname.getName(), s);
 	}
 	
 	public void oeffneRegistrierung()
@@ -180,9 +211,9 @@ public class ClientControl implements Runnable
 		{
 			if(pw.equals(pwBestaetigung))
 			{
-				Nickname n = new Nickname(email, nickname, pw);
+				Registrierung reg = new Registrierung(email, nickname, pw);
 
-				sendeObject(n);
+				sendeObject(reg);
 				
 				//#TODO
 				//Nickname verschlüsseln && an Datenbank/Server senden zwecks abgleich (Email schon vorhanden?)
@@ -207,12 +238,41 @@ public class ClientControl implements Runnable
 		if(pw != null && email != null)
 		{
 			AnmeldeObjekt ao = new AnmeldeObjekt(email, pw);
-			
 			sendeObject(ao);
 		}
 		else
 		{
 			JOptionPane.showMessageDialog(null,"Bitte füllen Sie alle Felder aus.","Fehler", JOptionPane.PLAIN_MESSAGE);
 		}
+	}
+
+	public ClientPrivat clientPrivatOeffnen(Nickname empfaenger)
+	{
+		Boolean flag = true;
+		ClientPrivat client = null;
+		
+		for(ClientPrivat cp : privateChatraeume)
+		{
+			if(cp.getEmpfaenger().equals(empfaenger))
+			{
+				flag = false;
+				client = cp;
+				cp.toFront();
+			}
+		}
+		
+		if(flag)
+		{
+			client = new ClientPrivat(this, empfaenger);
+			privateChatraeume.add(client);
+		}
+		return client;
+	}
+
+	public void privateNachrichtSenden(Nickname empfaenger, ClientPrivat cp)
+	{
+		PrivateNachricht pn = new PrivateNachricht(nickname, empfaenger, cp.getTextField_fluesterNachricht().getText());
+		sendeObject(pn);
+		cp.modelPrivateNachrichten.addElement(pn);
 	}
 }

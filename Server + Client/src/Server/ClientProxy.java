@@ -8,11 +8,15 @@ import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
 import java.io.OutputStream;
 import java.io.PrintWriter;
+import java.net.ServerSocket;
 import java.net.Socket;
+import java.net.SocketException;
 
 import Client.AnmeldeObjekt;
 import Client.Nachricht;
 import Client.Nickname;
+import Client.PrivateNachricht;
+import Client.Registrierung;
 import Client.Transport;
 
 
@@ -33,6 +37,7 @@ public class ClientProxy implements Runnable
 	{
 		this.aServer = control;
 		this.aSocket = s;
+		this.nick = new Nickname("", "");
 		benutzer++;
 		
 		try
@@ -83,19 +88,23 @@ public class ClientProxy implements Runnable
 						Nachricht n = (Nachricht) o;
 						aServer.broadcast(n);
 						break;
-					case "Nickname": 
-						nick = (Nickname) o;
-						aServer.registrierungPruefen(nick);
+					case "Registrierung": 
+						Registrierung reg = (Registrierung) o;
+						aServer.registrierungPruefen(reg);
 						break;
 					case "AnmeldeObjekt":
 						ao = (AnmeldeObjekt) o;
 						aServer.anmelden(ao);
 						break;
+					case "privateNachricht":
+						PrivateNachricht pn = (PrivateNachricht) o;
+						aServer.privateNachrichtSenden(pn);
+						break;
 					default: break;
 				}
 			}
 		}
-		catch (Exception e)
+		catch (ClassNotFoundException | IOException e)
 		{
 			//e.printStackTrace();
 			if(nick != null)
@@ -122,4 +131,18 @@ public class ClientProxy implements Runnable
 			e.printStackTrace();
 		}
 	}
+
+
+	public Nickname getNick()
+	{
+		return nick;
+	}
+
+
+	public void setNick(Nickname nick)
+	{
+		this.nick = nick;
+	}
+	
+	
 }

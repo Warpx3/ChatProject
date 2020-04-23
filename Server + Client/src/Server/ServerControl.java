@@ -17,12 +17,14 @@ import Client.AnmeldeBestaetigung;
 import Client.AnmeldeObjekt;
 import Client.Nachricht;
 import Client.Nickname;
+import Client.PrivateNachricht;
+import Client.Registrierung;
 
 public class ServerControl extends Thread implements Serializable
 {
 	private ArrayList<ClientProxy> liste = new ArrayList<>();
-	private ArrayList<Nickname> nicknameListe = new ArrayList<>();
-	private ClientProxy p;
+	private ArrayList<Registrierung> registrierungsliste = new ArrayList<>();
+	private ClientProxy clientproxy;
 	private ServerControl s;
 	private int port = 8008;
 	private ServerSocket socket;
@@ -72,8 +74,8 @@ public class ServerControl extends Thread implements Serializable
 			try
 			{
 				sleep(100);
-				p = new ClientProxy(this,socket.accept());
-				liste.add(p);
+				clientproxy = new ClientProxy(this,socket.accept());
+				liste.add(clientproxy);
 			}
 			catch(SocketTimeoutException e)
 			{
@@ -135,7 +137,7 @@ public class ServerControl extends Thread implements Serializable
 		broadcast(aktiveNutzer);
 	}
 	
-	public void registrierungPruefen(Nickname n)
+	public void registrierungPruefen(Registrierung register)
 	{	
 		boolean flag = false;
 	
@@ -143,16 +145,16 @@ public class ServerControl extends Thread implements Serializable
 		try(FileInputStream fis = new FileInputStream("datei.ser");
 				ObjectInputStream ois = new ObjectInputStream(fis))
 		{
-			nicknameListe = (ArrayList<Nickname>) ois.readObject();
+			registrierungsliste = (ArrayList<Registrierung>) ois.readObject();
 		}
 		catch(Exception ex)
 		{
 			ex.printStackTrace();
 		}
 		
-		for(Nickname nick : nicknameListe)
+		for(Registrierung reg : registrierungsliste)
 		{
-			if(nick.getEmail().equals(n.getEmail()))
+			if(reg.getEmail().equals(register.getEmail()))
 			{
 				flag = true;
 				//TODO
@@ -168,52 +170,64 @@ public class ServerControl extends Thread implements Serializable
 			try(FileOutputStream fos = new FileOutputStream("datei.ser");
 					ObjectOutputStream oos = new ObjectOutputStream(fos))
 			{
-				nicknameListe.add(n);
-				oos.writeObject(nicknameListe);
+				registrierungsliste.add(register);
+				oos.writeObject(registrierungsliste);
 			}
 			catch(Exception ex)
 			{
 				ex.printStackTrace();
 			}
 		
-			anmelden(new AnmeldeObjekt(n.getEmail(), n.getPasswort()));
+			anmelden(new AnmeldeObjekt(register.getEmail(), register.getPasswort()));
 		}
 	}
 	
-	public void anmelden(AnmeldeObjekt n)
+	public void anmelden(AnmeldeObjekt ao)
 	{
 		//Deserialisierung
 		try(FileInputStream fis = new FileInputStream("datei.ser");
 				ObjectInputStream ois = new ObjectInputStream(fis))
 		{
-			nicknameListe = (ArrayList<Nickname>) ois.readObject();
+			registrierungsliste = (ArrayList<Registrierung>) ois.readObject();
 		}
 		catch(Exception ex)
 		{
 			ex.printStackTrace();
 		}
 		
-		for(Nickname nick : nicknameListe)
+		for(Registrierung reg : registrierungsliste)
 		{			
-			if(nick.getEmail().equals(n.getEmail()) && nick.getPasswort().equals(n.getPasswort()))
+			if(reg.getEmail().equals(ao.getEmail()) && reg.getPasswort().equals(ao.getPasswort()))
 			{
-				angemeldeteNutzer.addElement(new Nickname(nick.getEmail(), nick.getName()));
+				Nickname nick = new Nickname(reg.getEmail(), reg.getName());
+				
+				angemeldeteNutzer.addElement(nick);
 				//Benutzer vorhanden, an Proxy senden
-				p.sendeObject(new AnmeldeBestaetigung(true, nick.getName()));
+				clientproxy.sendeObject(new AnmeldeBestaetigung(true, nick));
+				clientproxy.setNick(nick);
 				notifyObserver();
 			}
-			
 		}
 	}
 	
 	public void aktivenBenutzerEntfernen(String email)
 	{
-		System.out.println("hui");
 		for(int i = 0; i < angemeldeteNutzer.getSize(); i++)
 		{
 			if(angemeldeteNutzer.get(i).getEmail().equalsIgnoreCase(email))
 			{
 				angemeldeteNutzer.remove(i);
+			}
+		}
+	}
+	
+	public void privateNachrichtSenden(PrivateNachricht pn)
+	{
+		for(ClientProxy c : liste)
+		{
+			if(c != null && c.getNick().getEmail().equalsIgnoreCase(pn.getEmpfaenger().getEmail()))
+			{
+				c.sendeObject(pn);
 			}
 		}
 	}
@@ -236,7 +250,5 @@ public class ServerControl extends Thread implements Serializable
 	public void setListe(ArrayList<ClientProxy> liste)
 	{
 		this.liste = liste;
-	}
-	
-	
+	}	
 }
