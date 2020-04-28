@@ -12,6 +12,7 @@ import java.net.ServerSocket;
 import java.net.Socket;
 import java.net.SocketException;
 
+import Client.AktiveNutzerUpdate;
 import Client.AnmeldeObjekt;
 import Client.Nachricht;
 import Client.Nickname;
@@ -95,6 +96,7 @@ public class ClientProxy implements Runnable
 					case "AnmeldeObjekt":
 						ao = (AnmeldeObjekt) o;
 						aServer.anmelden(ao);
+						//Mark möchte hier nen Broadcast haben
 						break;
 					case "privateNachricht":
 						PrivateNachricht pn = (PrivateNachricht) o;
@@ -106,7 +108,8 @@ public class ClientProxy implements Runnable
 		}
 		catch (ClassNotFoundException | IOException e)
 		{
-			//e.printStackTrace();
+			AktiveNutzerUpdate anu = new AktiveNutzerUpdate(nick, false); 
+
 			if(nick != null)
 			{
 				aServer.aktivenBenutzerEntfernen(nick.getEmail());
@@ -115,7 +118,7 @@ public class ClientProxy implements Runnable
 			{
 				aServer.aktivenBenutzerEntfernen(ao.getEmail());
 			}
-			aServer.notifyObserver();
+			aServer.notifyObserver(anu);
 			this.t.interrupt();
 		}
 	}

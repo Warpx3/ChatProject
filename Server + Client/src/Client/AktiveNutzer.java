@@ -1,26 +1,25 @@
 package Client;
 
 import java.io.Serializable;
-
-import javax.swing.DefaultListModel;
+import java.util.ArrayList;
 
 public class AktiveNutzer extends Transport implements Serializable
 {
 	private static final long serialVersionUID = 1L;
-	private DefaultListModel<Nickname> benutzer;
+	private ArrayList<Nickname> benutzer;
 	
 	public AktiveNutzer()
 	{
 		super("aktiveNutzer");
-		benutzer = new DefaultListModel<>();
+		benutzer = new ArrayList<>();
 	}
 
-	public DefaultListModel<Nickname> getBenutzer()
+	public ArrayList<Nickname> getBenutzer()
 	{
 		return benutzer;
 	}
 
-	public void setBenutzer(DefaultListModel<Nickname> benutzer)
+	public void setBenutzer(ArrayList<Nickname> benutzer)
 	{
 		this.benutzer = benutzer;
 	}

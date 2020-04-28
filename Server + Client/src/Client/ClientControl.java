@@ -29,6 +29,7 @@ public class ClientControl implements Runnable
 	private int port = 8008;
 	
 	private DefaultListModel<String> nachrichten = new DefaultListModel<String>();
+	private DefaultListModel<Nickname> derzeitigeBenutzer = new DefaultListModel<Nickname>();
 	private AktiveNutzer an;
 	
 	private ArrayList<ClientPrivat> privateChatraeume = new ArrayList<>();
@@ -126,18 +127,32 @@ public class ClientControl implements Runnable
 						clientGui.getList().setModel(nachrichten);
 						break;
 					case "aktiveNutzer":
-						//AktiveNutzer an = new AktiveNutzer();
 						an = (AktiveNutzer) o;
 						if(an.getBenutzer() != null && an != null)
 						{
-							for(int i = 0; i < an.getBenutzer().getSize(); i++)
+							for(int i = 0; i < an.getBenutzer().size(); i++)
 							{
 								System.out.println(i + ": aktiveNutzer: " + an.getBenutzer().get(i));
 							}
-							
-							clientGui.getList_angemeldeteNutzer().setModel(an.getBenutzer());
+							derzeitigeBenutzer = convertArrayListToDefaultListModel(an.getBenutzer());
+							clientGui.getList_angemeldeteNutzer().setModel(derzeitigeBenutzer);
 						}
 						an = null;
+						break;
+					case "aktiveNutzerUpdate":
+						AktiveNutzerUpdate anu = (AktiveNutzerUpdate) o;
+						
+						System.out.println("aktiveNutzerUpdateCase: " + anu.getNick());
+					
+						if(anu.isHinzufuegen())
+						{
+							System.out.println("Boolwert: " + anu.isHinzufuegen());
+							derzeitigeBenutzer.addElement(anu.getNick());
+						}
+						else
+						{
+							derzeitigeBenutzer.removeElement(anu.getNick());
+						}
 						break;
 					case "privateNachricht":
 						PrivateNachricht pn = (PrivateNachricht) o;
@@ -152,29 +167,6 @@ public class ClientControl implements Runnable
 			e.printStackTrace();
 		}
 	}
-	
-	/*private void empfangePrivateNachricht(PrivateNachricht pn)
-	{
-		Boolean flag = true;
-		
-		for(ClientPrivat cp : privateChatraeume)
-		{
-			if(cp.getEmpfaenger().equals(pn.getAbsender()))
-			{
-				flag = false;
-				cp.modelPrivateNachrichten.addElement(pn);
-				cp.toFront();
-			}
-		}
-		
-		if(flag)
-		{
-			ClientPrivat privaterChatraum = new ClientPrivat(this, pn.getAbsender());
-			privateChatraeume.add(privaterChatraum);
-		}
-		
-		clientPrivatOeffnen(pn.getAbsender()).modelPrivateNachrichten.addElement(pn);
-	}*/
 
 	public void sendeObject(Object o)
 	{
@@ -274,5 +266,17 @@ public class ClientControl implements Runnable
 		PrivateNachricht pn = new PrivateNachricht(nickname, empfaenger, cp.getTextField_fluesterNachricht().getText());
 		sendeObject(pn);
 		cp.modelPrivateNachrichten.addElement(pn);
+	}
+	
+	public DefaultListModel<Nickname> convertArrayListToDefaultListModel(ArrayList<Nickname> arrayList)
+	{
+		DefaultListModel<Nickname> modelAktiveNicks = new DefaultListModel<>();
+		
+		for(Nickname nick : arrayList)
+		{
+			modelAktiveNicks.addElement(nick);
+		}
+		
+		return modelAktiveNicks;
 	}
 }
