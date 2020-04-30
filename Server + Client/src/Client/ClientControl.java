@@ -31,7 +31,6 @@ public class ClientControl implements Runnable
 	private DefaultListModel<String> nachrichten = new DefaultListModel<String>();
 	private DefaultListModel<Nickname> derzeitigeBenutzer = new DefaultListModel<Nickname>();
 	private AktiveNutzer an;
-	
 	private ArrayList<ClientPrivat> privateChatraeume = new ArrayList<>();
 	
 	private ClientGui clientGui;
@@ -130,10 +129,6 @@ public class ClientControl implements Runnable
 						an = (AktiveNutzer) o;
 						if(an.getBenutzer() != null && an != null)
 						{
-							for(int i = 0; i < an.getBenutzer().size(); i++)
-							{
-								System.out.println(i + ": aktiveNutzer: " + an.getBenutzer().get(i));
-							}
 							derzeitigeBenutzer = convertArrayListToDefaultListModel(an.getBenutzer());
 							clientGui.getList_angemeldeteNutzer().setModel(derzeitigeBenutzer);
 						}
@@ -141,12 +136,9 @@ public class ClientControl implements Runnable
 						break;
 					case "aktiveNutzerUpdate":
 						AktiveNutzerUpdate anu = (AktiveNutzerUpdate) o;
-						
-						System.out.println("aktiveNutzerUpdateCase: " + anu.getNick());
 					
 						if(anu.isHinzufuegen())
 						{
-							System.out.println("Boolwert: " + anu.isHinzufuegen());
 							derzeitigeBenutzer.addElement(anu.getNick());
 						}
 						else
@@ -245,7 +237,7 @@ public class ClientControl implements Runnable
 		
 		for(ClientPrivat cp : privateChatraeume)
 		{
-			if(cp.getEmpfaenger().equals(empfaenger))
+			if(cp.getEmpfaenger().getEmail().equals(empfaenger.getEmail()))
 			{
 				flag = false;
 				client = cp;
@@ -278,5 +270,10 @@ public class ClientControl implements Runnable
 		}
 		
 		return modelAktiveNicks;
+	}
+
+	public Nickname getNickname()
+	{
+		return nickname;
 	}
 }

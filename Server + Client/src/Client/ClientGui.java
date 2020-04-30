@@ -12,6 +12,8 @@ import javax.swing.JList;
 import javax.swing.JLabel;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
+import java.awt.event.ActionListener;
+import java.awt.event.ActionEvent;
 
 public class ClientGui extends JFrame
 {
@@ -26,14 +28,15 @@ public class ClientGui extends JFrame
 
 	public ClientGui(ClientControl client)
 	{
-		initialize();
 		this.client = client;
+		initialize();
 		setVisible(true);
+		textFieldNachricht.requestFocusInWindow();
 	}
 
 	private void initialize()
 	{
-		setTitle("Client");
+		setTitle(client.getNickname().getName());
 		setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 		setBounds(100, 100, 577, 286);
 		contentPane = new JPanel();
@@ -52,8 +55,10 @@ public class ClientGui extends JFrame
 		{
 			btnSenden = new JButton("Senden");
 			btnSenden.setBounds(335, 219, 89, 23);
-			btnSenden.addActionListener(e -> {
+			btnSenden.addActionListener(e -> 
+			{
 				client.sendeObject(client.createNachricht(getTextFieldNachricht().getText()));
+				getTextFieldNachricht().setText("");
 			});
 		}
 		return btnSenden;
@@ -64,6 +69,14 @@ public class ClientGui extends JFrame
 		if (textFieldNachricht == null)
 		{
 			textFieldNachricht = new JTextField();
+			textFieldNachricht.addActionListener(new ActionListener()
+			{
+				public void actionPerformed(ActionEvent e)
+				{
+					client.sendeObject(client.createNachricht(getTextFieldNachricht().getText()));
+					getTextFieldNachricht().setText("");
+				}
+			});
 			textFieldNachricht.setBounds(10, 220, 315, 20);
 			textFieldNachricht.setColumns(10);
 		}
@@ -90,7 +103,7 @@ public class ClientGui extends JFrame
 				@Override
 				public void mouseClicked(MouseEvent e)
 				{
-					Nickname nick = new Nickname(((Nickname)list_angemeldeteNutzer.getSelectedValue()).getEmail(), ((Nickname)list_angemeldeteNutzer.getSelectedValue()).getName());
+					Nickname nick = new Nickname(((Nickname) list_angemeldeteNutzer.getSelectedValue()).getEmail(),((Nickname) list_angemeldeteNutzer.getSelectedValue()).getName());
 					client.clientPrivatOeffnen(nick);
 				}
 			});

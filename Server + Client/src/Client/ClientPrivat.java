@@ -35,6 +35,7 @@ public class ClientPrivat extends JFrame
 
 	private void initialize()
 	{
+		setTitle(control.getNickname().getName());
 		setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
 		setBounds(100, 100, 450, 300);
 		contentPane = new JPanel();
@@ -47,6 +48,14 @@ public class ClientPrivat extends JFrame
 		contentPane.add(list_fluesterNachricht);
 
 		textField_fluesterNachricht = new JTextField();
+		textField_fluesterNachricht.addActionListener(new ActionListener()
+		{
+			public void actionPerformed(ActionEvent e)
+			{
+				control.privateNachrichtSenden(empfaenger, ClientPrivat.this);
+				textField_fluesterNachricht.setText("");
+			}
+		});
 		textField_fluesterNachricht.setBounds(10, 231, 315, 20);
 		contentPane.add(textField_fluesterNachricht);
 		textField_fluesterNachricht.setColumns(10);
@@ -56,13 +65,15 @@ public class ClientPrivat extends JFrame
 		{
 			public void actionPerformed(ActionEvent e)
 			{
-				//Nachricht senden
+				// Nachricht senden
 				control.privateNachrichtSenden(empfaenger, ClientPrivat.this);
+				textField_fluesterNachricht.setText("");
 			}
 		});
 		btn_Senden.setBounds(335, 230, 89, 23);
 		contentPane.add(btn_Senden);
 		setVisible(true);
+		textField_fluesterNachricht.requestFocusInWindow();
 	}
 
 	public JTextField getTextField_fluesterNachricht()
@@ -94,5 +105,5 @@ public class ClientPrivat extends JFrame
 	{
 		this.list_fluesterNachricht = list_fluesterNachricht;
 	}
-	
+
 }

@@ -50,7 +50,7 @@ public class PrivateNachricht extends Transport implements Serializable
 	@Override
 	public String toString()
 	{
-		return absender + ": " + nachricht;
+		return absender.getName() + ": " + nachricht;
 	}
 	
 	
