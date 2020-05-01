@@ -2,11 +2,12 @@ package Server;
 
 import java.io.IOException;
 import java.net.ServerSocket;
+import java.net.Socket;
 import java.net.SocketTimeoutException;
 import java.util.ArrayList;
 import Client.Nachricht;
 
-public class ServerControl extends Thread
+public class ServerControl extends Thread implements DOSProtection
 {
 	private ArrayList<ClientProxy> liste = new ArrayList<>();
 	private ClientProxy p;
@@ -110,4 +111,28 @@ public class ServerControl extends Thread
 		p.sendeNachricht(new Nachricht("Server","Nicht so schnell!"));
 	}
 	
+	@Override
+	public boolean joinCheck (Socket socket)
+	{
+		if(liste.isEmpty() == false)
+		{
+			if(liste.get(0).getBenutzer() < 50)
+			{
+				for (ClientProxy clientProxy : liste)
+				{
+					if(clientProxy.getaSocket().getInetAddress() == socket.getInetAddress())
+					{
+						System.out.println(socket.getInetAddress() + " " + clientProxy.getaSocket().getInetAddress());
+						return false;
+					}
+				}
+				
+				return true;
+			}
+			
+			return false;
+		}
+		
+		return false;
+	}	
 }
